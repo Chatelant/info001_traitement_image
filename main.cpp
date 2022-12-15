@@ -148,9 +148,6 @@ int main(int argc, char *argv[])
     int old_value = 0;
     int value = 128;
 
-    namedWindow("TP1 Grey IMG"); // crée une fenêtre
-    // createTrackbar("track grey", "TP1 Grey IMG", &value, 255, nullptr); // un slider
-
     Mat f = imread(path + filename); // lit l'image  donné en argument
     if (f.channels() > 1)
     {
@@ -162,20 +159,22 @@ int main(int argc, char *argv[])
     std::vector<double> histCumule = histogramme_cumule(hist);
 
     // Egalisation
-    // Mat equalizedImg = equalization(f, hist, histCumule);
+    Mat equalizedImg = equalization(f, hist, histCumule);
 
     cv::Mat displayHistogrammes = afficheHistogrammes(hist, histCumule);
-    namedWindow("Histogrammes Grey IMG");
-    imshow("Histogrammes Grey IMG", displayHistogrammes); // l'affiche dans la fenêtre
+    namedWindow("Histogrammes image egalisee");
+    imshow("Histogrammes image egalisee", displayHistogrammes); // l'affiche dans la fenêtre
 
     // Tramage Floyd Steinberg
     Mat tramedImg(f.rows, f.cols, CV_32FC1, 0.0);
     tramage_floyd_steinberg(f, tramedImg);
 
-    // imshow("TP1 Grey IMG", f); // l'affiche dans la fenêtre
-    // imshow("TP1 Grey IMG", equalizedImg); // l'affiche dans la fenêtre
-    imshow("TP1 Grey IMG", tramedImg); // l'affiche dans la fenêtre
-
+    namedWindow("Image de base");
+    namedWindow("Image egalisee");
+    namedWindow("Image trame");
+    imshow("Image de base", f);
+    imshow("Image egalisee", equalizedImg);
+    imshow("Image trame", tramedImg);
     while (waitKey(50) < 0) // attend une touche
     {                       // Affiche la valeur du slider
         if (value != old_value)

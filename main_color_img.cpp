@@ -215,96 +215,89 @@ cv::Mat tramage_floyd_steinberg_generique(cv::Mat input,
 
 int main(int argc, char *argv[])
 {
-    if (argv[1] == nullptr)
+    if (argv[1] == nullptr || argv[2] == nullptr)
     {
-        std::cout << "\nUsage : ./main <nom-fichier-image>\n"
-                  << std::endl;
+        std::cout << "\nUsage : ./main_color <nom-fichier-image> <traitement>" << std::endl;
+        std::cout << "traitements : none, egal, trame, tram_gen" << std::endl;
         exit(1);
     }
 
     std::string filename = argv[1];
     std::string path = "/home/user/TP1/";
+    std::string traitement = argv[2];
 
     int old_value = 0;
     int value = 128;
 
     Mat f = imread(path + filename); // lit l'image  donné en argument
 
-    // ----------
+    // ----- None ----- //
+    if (traitement == "none")
+    {
+        namedWindow("Aucun traitement");
+        imshow("Aucun traitement", f);
+    }
 
-    // // Conversion BGR to HSV
-    // cv::cvtColor(f, f, COLOR_BGR2HSV);
+    // ----- Egalisation ----- //
+    else if (traitement == "egal")
+    {
+        // Conversion BGR to HSV
+        cv::cvtColor(f, f, COLOR_BGR2HSV);
 
-    // // Histogrammes
-    // std::vector<double> hist = histogramme(f);
-    // std::vector<double> histCumule = histogramme_cumule(hist);
+        // Histogrammes
+        std::vector<double> hist = histogramme(f);
+        std::vector<double> histCumule = histogramme_cumule(hist);
 
-    // // Egalisation
-    // Mat equalizedImg = equalization(f, hist, histCumule);
+        // Egalisation
+        Mat equalizedImg = equalization(f, hist, histCumule);
 
-    // // Conversion HSV to BGR
-    // cv::cvtColor(equalizedImg, equalizedImg, COLOR_HSV2BGR);
+        // Conversion HSV to BGR
+        cv::cvtColor(equalizedImg, equalizedImg, COLOR_HSV2BGR);
 
-    // imshow("TP1 Color IMG", equalizedImg); // l'affiche dans la fenêtre
-
-    // cv::Mat displayHistogrammes = afficheHistogrammes(hist, histCumule);
-    // namedWindow("Histogrammes Color IMG");
-    // imshow("Histogrammes Color IMG", displayHistogrammes); // l'affiche dans la fenêtre
-
-    // ----------
+        namedWindow("Image egalise");
+        imshow("Image egalise", equalizedImg); // l'affiche dans la fenêtre
+        cv::Mat displayHistogrammes = afficheHistogrammes(hist, histCumule);
+        namedWindow("Histogrammes");
+        imshow("Histogrammes", displayHistogrammes); // l'affiche dans la fenêtre
+    }
 
     // ----- Tramage Floyd Steinberg ----- //
-    // Mat tramedImg(f.rows, f.cols, CV_32FC3, 0.0);
-    // tramage_floyd_steinberg(f, tramedImg);
-    // namedWindow("TP1 tramage floyd");
-    // imshow("TP1 tramage floyd", tramedImg); // l'affiche dans la fenêtre
-
-    // ----------
+    else if (traitement == "trame")
+    {
+        Mat tramedImg(f.rows, f.cols, CV_32FC3, 0.0);
+        tramage_floyd_steinberg(f, tramedImg);
+        namedWindow("TP1 tramage floyd");
+        imshow("TP1 tramage floyd", tramedImg); // l'affiche dans la fenêtre
+    }
 
     // ----- Tramage Floyd Steinberg generique ----- //
-
-    // Vec3f blue({1.0, 0.0, 0.0});
-    // Vec3f green({0.0, 1.0, 0.0});
-    // Vec3f red({0.0, 0.0, 1.0});
-    // Vec3f cyan({1.0, 1.0, 0.0});
-    // Vec3f magenta({1.0, 0.0, 1.0});
-    // Vec3f yellow({0.0, 1.0, 1.0});
-    // Vec3f black({0.0, 0.0, 0.0});
-    // Vec3f white({1.0, 1.0, 1.0});
-    // std::vector<Vec3f> colors_bgr = {blue, green, red, black, white};
-    // std::vector<Vec3f> colors_cmjn = {cyan, magenta, yellow, black, white};
-
-    // Mat sortie_bgr = tramage_floyd_steinberg_generique(f, colors_bgr);
-    // Mat sortie_cmjn = tramage_floyd_steinberg_generique(f, colors_cmjn);
-    // namedWindow("TP1 tramage floyd BGR"); // crée une fenêtre
-    // namedWindow("TP1 tramage floyd CMJN"); // crée une fenêtre
-    // imshow("TP1 tramage floyd BGR", sortie_bgr); // l'affiche dans la fenêtre
-    // imshow("TP1 tramage floyd CMJN", sortie_cmjn); // l'affiche dans la fenêtre
-
-    // ----- Video ----- //
-    VideoCapture cap(0,'http://10.7.145.236:8080/stream');
-    if (!cap.isOpened())
-        return -1;
-    Mat frame, edges;
-    namedWindow("edges", WINDOW_AUTOSIZE);
-    for (;;)
+    else if (traitement == "tram_gen")
     {
-        cap >> frame;
-        cvtColor(frame, edges, COLOR_BGR2GRAY);
-        imshow("edges", edges);
-        int key_code = waitKey(30);
-        int ascii_code = key_code & 0xff;
-        if (ascii_code == 'q')
-            break;
-    }
-    return 0;
+        Vec3f blue({1.0, 0.0, 0.0});
+        Vec3f green({0.0, 1.0, 0.0});
+        Vec3f red({0.0, 0.0, 1.0});
+        Vec3f cyan({1.0, 1.0, 0.0});
+        Vec3f magenta({1.0, 0.0, 1.0});
+        Vec3f yellow({0.0, 1.0, 1.0});
+        Vec3f black({0.0, 0.0, 0.0});
+        Vec3f white({1.0, 1.0, 1.0});
+        std::vector<Vec3f> colors_bgr = {blue, green, red, black, white};
+        std::vector<Vec3f> colors_cmjn = {cyan, magenta, yellow, black, white};
 
-    // while (waitKey(50) < 0) // attend une touche
-    // {                       // Affiche la valeur du slider
-    //     if (value != old_value)
-    //     {
-    //         old_value = value;
-    //         std::cout << "value=" << value << std::endl;
-    //     }
-    // }
+        Mat sortie_bgr = tramage_floyd_steinberg_generique(f, colors_bgr);
+        Mat sortie_cmjn = tramage_floyd_steinberg_generique(f, colors_cmjn);
+        namedWindow("TP1 tramage floyd BGR");          // crée une fenêtre
+        namedWindow("TP1 tramage floyd CMJN");         // crée une fenêtre
+        imshow("TP1 tramage floyd BGR", sortie_bgr);   // l'affiche dans la fenêtre
+        imshow("TP1 tramage floyd CMJN", sortie_cmjn); // l'affiche dans la fenêtre
+    }
+
+    while (waitKey(50) < 0) // attend une touche
+    {                       // Affiche la valeur du slider
+        if (value != old_value)
+        {
+            old_value = value;
+            std::cout << "value=" << value << std::endl;
+        }
+    }
 }
