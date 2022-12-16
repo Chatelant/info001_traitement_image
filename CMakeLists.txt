@@ -7,6 +7,7 @@ include_directories( ${OpenCV_INCLUDE_DIRS} )
 SET( MAIN_EXEC
      main
      main_color_img
+     main_video
      # vous pouvez ajouter d'autres programmes ici
      )
 
